@@ -82,7 +82,6 @@ input[type=number]{width:100%;font:inherit;font-size:1rem;color:var(--char);back
 .sr{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 a{color:#024a2f}
 h4{color:var(--forest);font-size:1.125rem;line-height:1.3;margin:0 0 .5rem}
-.task legend{font-size:1.125rem}
 .weeks{list-style:none;margin:0;padding:0}
 .weeks li.card{margin:0 0 1rem}
 .meter{height:14px;background:var(--sage-tint);border:2px solid var(--forest);border-radius:8px;overflow:hidden;margin:.25rem 0 .75rem}
@@ -93,11 +92,14 @@ h4{color:var(--forest);font-size:1.125rem;line-height:1.3;margin:0 0 .5rem}
 .st.over{background:var(--coral-tint);color:#5a1f14;border-color:var(--coral)}
 .weeks .over-card{border-color:var(--coral)}
 .weeks .crowd-card{border-color:var(--gold)}
-dl{margin:0}
-dt{font-weight:bold;color:var(--forest);margin-top:.5rem}
-dd{margin:0}
 ol.plain{margin:0 0 1rem;padding-left:1.6rem}
 ol.plain li{margin:.5rem 0}
+details{background:var(--white);border:2px solid var(--sage);border-radius:10px;padding:.5rem 1.25rem;margin:0 0 1.25rem}
+details[open]{padding-bottom:1rem}
+summary{font-weight:bold;color:var(--forest);cursor:pointer;min-height:44px;display:flex;align-items:center}
+.sum{background:var(--ivory);border:2px solid var(--sage);border-radius:8px;padding:.5rem 1rem;margin:.5rem 0 1rem}
+.sum ul{margin:.25rem 0;padding-left:1.3rem}
+.sum li{margin:.15rem 0}
 @media print{.weeks li.card{break-inside:avoid}.meter{border:1px solid #000}.meter span{background:#000}.st{border:1px solid #000;background:#fff;color:#000}}
 </style>
 </head>
@@ -109,7 +111,7 @@ ol.plain li{margin:.5rem 0}
 <p>Add your due dates and your busy hours. See which weeks get crowded and what to work on first.</p>
 </div></header>
 <main id="main">
-<noscript><div class="warn">This tool needs JavaScript turned on. Without it, you can still do the same thing on paper: list every due date, guess the hours each task needs, and count how many hours you have each week. Mark any week where the hours you need are close to the hours you have.</div></noscript>
+<noscript><div class="warn">This tool needs JavaScript turned on. Without it, you can still do the same thing on paper: list the hours already taken in your week (class, work, family, travel, sleep), subtract them from 168 to see the hours left, then list every due date and guess the hours each task needs. Mark any week where the hours you need are close to the hours you have.</div></noscript>
 
 <div id="app" hidden>
 <p class="progress" id="prog"></p>
@@ -118,36 +120,53 @@ ol.plain li{margin:.5rem 0}
 <section id="s1" aria-labelledby="h1a">
 <h2 id="h1a" tabindex="-1">Step 1. Your time</h2>
 <div id="vid" hidden class="note"><p style="margin:0 0 .75rem"><strong>New to this tool?</strong> A short how-to video shows how to use each step.</p><a class="btn" id="vidLink" href="#" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;line-height:1.9">Watch the how-to video<span class="sr"> (opens in a new tab)</span></a></div>
-<div class="note"><p style="margin:0 0 .75rem">When several due dates land in the same week, it is easy to feel buried. This tool adds up the hours you enter and shows which weeks look crowded, so you can plan before they arrive.</p><p style="margin:0">You enter every number yourself. Nothing is saved or sent anywhere. The tool does not predict grades.</p></div>
+<div class="note"><p style="margin:0 0 .75rem">When several due dates land in the same week, it is easy to feel buried. This tool adds up the hours you enter and shows which weeks look crowded, so you can plan before they arrive.</p><p style="margin:0">It also helps you see how much time your week really has for your education. First you list the hours that are already taken. The tool shows the hours that are left, and you decide how many of them can go to homework and studying.</p></div>
 <div class="err warn" id="err1" role="alert"></div>
 <div class="card">
-<div class="field"><label class="lbl" for="start">What is the first day of your plan?</label>
-<p class="hint" id="startH">Weeks are counted in blocks of 7 days starting on this date. Today is filled in. You can change it.</p>
-<input type="date" id="start" aria-describedby="startH"></div>
-</div>
-<div class="card">
-<h3 style="margin-top:0">Hours that are already taken</h3>
-<p class="hint">Enter the hours in a typical week. A rough number is fine. Leave a box blank if it does not apply.</p>
+<h3 style="margin-top:0">Your typical week</h3>
+<p class="hint">Enter the hours that are already taken in a typical week. A rough number is fine. Leave a box blank if it does not apply. You can set different hours for particular weeks in the next step.</p>
+<details>
+<summary>Not sure about your hours?</summary>
+<p class="small">Keep a simple note for one typical week before you fill this in. Write down when you are in class, at work, caring for family, and traveling. Round to the nearest hour. Then come back and enter your numbers.</p>
+</details>
 <div class="grid2">
-<div class="field"><label class="lbl" for="fw">Paid work</label><input type="number" id="fw" min="0" max="168" inputmode="decimal"></div>
-<div class="field"><label class="lbl" for="ff">Family and care (children, relatives, home)</label><input type="number" id="ff" min="0" max="168" inputmode="decimal"></div>
-<div class="field"><label class="lbl" for="fo">Other fixed hours (class time, travel, appointments)</label><input type="number" id="fo" min="0" max="168" inputmode="decimal"></div>
-<div class="field"><label class="lbl" for="fs">Sleep, meals, and personal care</label><input type="number" id="fs" min="0" max="168" inputmode="decimal" value="70" aria-describedby="fsH"></div>
+<div class="field"><label class="lbl" for="ct">Time in class (include labs and online class meetings)</label><input type="number" id="ct" min="0" max="168" step="0.5" inputmode="decimal"></div>
+<div class="field"><label class="lbl" for="fw">Paid work</label><input type="number" id="fw" min="0" max="168" step="0.5" inputmode="decimal"></div>
+<div class="field"><label class="lbl" for="ff">Family and care (children, relatives, home)</label><input type="number" id="ff" min="0" max="168" step="0.5" inputmode="decimal"></div>
+<div class="field"><label class="lbl" for="ftr">Travel to school and work</label><input type="number" id="ftr" min="0" max="168" step="0.5" inputmode="decimal"></div>
+<div class="field"><label class="lbl" for="fo">Other fixed hours (appointments, regular commitments)</label><input type="number" id="fo" min="0" max="168" step="0.5" inputmode="decimal"></div>
 </div>
-<p class="hint" id="fsH">The 70 is only a starting guess of about 10 hours a day. Change it to fit your life.</p>
-<p id="left" role="status" class="score"></p>
+<div class="grid2">
+<div class="field"><label class="lbl" for="sl">Sleep, hours per night</label><input type="number" id="sl" min="0" max="24" step="0.5" inputmode="decimal" value="8" aria-describedby="slH"></div>
+<div class="field"><label class="lbl" for="ml">Meals and personal care, hours per day</label><input type="number" id="ml" min="0" max="24" step="0.5" inputmode="decimal" value="2" aria-describedby="slH"></div>
+</div>
+<p class="hint" id="slH">The 8 and the 2 are only starting guesses. Change them to fit your life.</p>
+<div class="sum"><p style="margin:0" class="score">Hours already taken in a week</p><ul id="brk"></ul><p id="left" role="status" class="score" style="margin:.5rem 0 0"></p></div>
 </div>
 <div class="card">
-<div class="field"><label class="lbl" for="wk">How many hours a week can you give to homework and studying?</label>
-<p class="hint" id="wkH">Be realistic, and leave time to rest. You can set different hours for particular weeks in the next step.</p>
+<h3 style="margin-top:0">Your time for school</h3>
+<div class="field"><label class="lbl" for="wk">How many hours a week will you give to homework and studying outside of class?</label>
+<p class="hint" id="wkH">Class time is already counted above, so leave it out here.<span id="wkLeft"></span></p>
 <input type="number" id="wk" min="0.5" max="100" step="0.5" inputmode="decimal" aria-describedby="wkH"></div>
+<p id="after" role="status" class="score"></p>
+<details>
+<summary>Optional: check your hours against your units</summary>
+<p class="small">If your classes are for credit, enter the number of units you are taking. If your classes are noncredit, skip this and ask your program how many hours a week it expects.</p>
+<div class="field" style="max-width:16rem"><label class="lbl" for="un">Units you are taking</label><input type="number" id="un" min="0" max="40" step="0.5" inputmode="decimal"></div>
+<p id="unitsOut" role="status" class="small"></p>
+</details>
 </div>
+<details>
+<summary>Plan from a different date (optional)</summary>
+<p class="small" id="startH">The plan starts today. If you are planning ahead, you can pick a different first day.</p>
+<div class="field" style="max-width:16rem"><label class="lbl" for="start">First day of your plan</label><input type="date" id="start" aria-describedby="startH"></div>
+</details>
 <div class="row"><button type="button" class="btn" id="to2">Next: Add your tasks</button></div>
 </section>
 
 <section id="s2" aria-labelledby="h2a" hidden>
 <h2 id="h2a" tabindex="-1">Step 2. Your tasks</h2>
-<div class="note"><p style="margin:0">A task is anything with a due date: a paper, an exam to study for, a quiz, a lab, a shift swap you need to arrange. Add each one, then guess how many hours of work it needs. Use your syllabus for the due dates.</p></div>
+<div class="note"><p style="margin:0">A task is anything with a due date: a paper, an exam to study for, a quiz, a lab, a shift swap you need to arrange. Add each one, then guess how many hours of your own work it needs outside of class. Do not count time in class. Use your syllabus for the due dates.</p></div>
 <div class="err warn" id="err2" role="alert"></div>
 <p class="hint" id="sizeH">The sizes are rough guesses. If you know how long something takes you, type the hours in the "Or type the hours" box. That box wins over the size.</p>
 <div id="tasks"></div>
@@ -157,15 +176,17 @@ ol.plain li{margin:.5rem 0}
 <p class="small" id="taskMsg" role="status"></p>
 
 <h3>Weeks when your hours are different (optional)</h3>
-<p class="hint">For a week with extra work shifts, a trip, or a day off, enter any date in that week and the study hours you will have that week.</p>
+<p class="hint">For a week with extra work shifts, a trip, or a day off, enter any date in that week and the hours you will have for homework and studying that week. For this week, enter the hours from today through Sunday.</p>
 <div id="overs"></div>
 <div class="row"><button type="button" class="btn2" id="addO">Add a different week</button></div>
 <p class="small" id="overMsg" role="status"></p>
 
 <div class="row">
-<button type="button" class="btn2" id="back1">Back</button>
+<button type="button" class="btn2" id="back1">Back to Step 1</button>
+<button type="button" class="btn2" id="so2">Start over</button>
 <button type="button" class="btn" id="to3">Next: See your plan</button>
 </div>
+<div class="warn noprint" id="rs2" tabindex="-1" role="group" aria-labelledby="rs2t" hidden style="margin-top:1rem"><p id="rs2t" style="margin:0 0 .5rem"><strong>Start over?</strong> This clears everything you entered, including your hours, and takes you back to Step 1.</p><div class="row" style="margin-top:.5rem"><button type="button" class="btn" id="rsY2">Yes, clear everything</button><button type="button" class="btn2" id="rsN2">No, keep my answers</button></div></div>
 </section>
 
 <section id="s3" aria-labelledby="h3a" hidden>
@@ -175,7 +196,10 @@ ol.plain li{margin:.5rem 0}
 <button type="button" class="btn" id="copyBtn">Copy my plan</button>
 <button type="button" class="btn2" id="printBtn">Print my plan</button>
 <button type="button" class="btn2" id="back2">Change my tasks</button>
+<button type="button" class="btn2" id="hrs3">Change my hours</button>
+<button type="button" class="btn2" id="so3">Start over</button>
 </div>
+<div class="warn noprint" id="rs3" tabindex="-1" role="group" aria-labelledby="rs3t" hidden style="margin-top:1rem"><p id="rs3t" style="margin:0 0 .5rem"><strong>Start over?</strong> This clears everything you entered, including your hours, and takes you back to Step 1.</p><div class="row" style="margin-top:.5rem"><button type="button" class="btn" id="rsY3">Yes, clear everything</button><button type="button" class="btn2" id="rsN3">No, keep my answers</button></div></div>
 <p class="small noprint" id="copyMsg" role="status"></p>
 <p class="small noprint">You can also print with Ctrl+P (Windows) or Cmd+P (Mac).</p>
 <div id="fbWrap" hidden><label class="lbl" for="fb">Copy this text yourself (select all, then copy)</label><textarea id="fb" class="fallback" readonly></textarea></div>
@@ -192,7 +216,8 @@ ol.plain li{margin:.5rem 0}
 var $=function(id){return document.getElementById(id)};
 var DAY=86400000,MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 var SIZES=[['','Choose a size'],['1','Small (about 1 hour)'],['3','Medium (about 3 hours)'],['6','Large (about 6 hours)'],['12','Very large (about 12 hours)']];
-var BUFFER=0.7,CROWD_COUNT=3,MAXW=26,MAXT=30,MAXO=6;
+var BUFFER=0.7,CROWD_COUNT=3,MAXW=26,MAXT=30,MAXO=6,UNIT_HOURS=3;
+var FIX=[['ct','Time in class'],['fw','Paid work'],['ff','Family and care'],['ftr','Travel to school and work'],['fo','Other fixed hours']];
 var tasks=[],overs=[],cur=1,lastText='';
 var VIDEO_URL='';
 if(VIDEO_URL){$('vidLink').href=VIDEO_URL;$('vid').hidden=false}
@@ -203,13 +228,15 @@ function num(v){if(v===''||v==null)return null;var x=parseFloat(v);return isNaN(
 function parseDate(s){if(!/^\d{4}-\d{2}-\d{2}$/.test(s))return null;var p=s.split('-'),t=Date.UTC(+p[0],+p[1]-1,+p[2]),d=new Date(t);if(d.getUTCMonth()!==(+p[1]-1)||d.getUTCDate()!==+p[2])return null;return Math.round(t/DAY)}
 function dstr(n){var d=new Date(n*DAY);return DOW[d.getUTCDay()]+' '+MONTHS[d.getUTCMonth()]+' '+d.getUTCDate()}
 function dstrY(n){var d=new Date(n*DAY);return dstr(n)+', '+d.getUTCFullYear()}
+function todayDay(){var d=new Date();return Math.round(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/DAY)}
+function planStart(){var s=val('start');return s===''?todayDay():parseDate(s)}
+function monIdx(day){return (new Date(day*DAY).getUTCDay()+6)%7}
 function half(x){return Math.round(x*2)/2}
 function hrs(x){var h=half(x);return (h===1?'1 hour':h+' hours')}
 function hrsMin(x){var h=half(x);if(h<0.5&&x>0.1)h=0.5;return (h===1?'1 hour':h+' hours')}
 function pct(a,b){return b>0?Math.round(a/b*100):0}
-function todayStr(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)}
 
-/* ---------- rows ---------- */
+/* ---------- task and week rows ---------- */
 function blankT(){return {c:'',n:'',d:'',s:'',h:''}}
 function readTasks(){tasks=tasks.map(function(t,i){var p='t'+i+'_';if(!$(p+'n'))return t;return {c:val(p+'c'),n:val(p+'n'),d:val(p+'d'),s:val(p+'s'),h:val(p+'h')}})}
 function readOvers(){overs=overs.map(function(o,i){var p='o'+i+'_';if(!$(p+'d'))return o;return {d:val(p+'d'),h:val(p+'h')}})}
@@ -228,7 +255,7 @@ function renderOvers(){var h='';
   overs.forEach(function(o,i){var p='o'+i+'_';
     h+='<fieldset class="task"><legend>Different week '+(i+1)+'</legend><div class="grid2">'
     +'<div class="field"><label class="lbl" for="'+p+'d">Any date in that week</label><input type="date" id="'+p+'d" value="'+esc(o.d)+'"></div>'
-    +'<div class="field"><label class="lbl" for="'+p+'h">Study hours you will have that week</label><input type="number" id="'+p+'h" min="0" max="168" step="0.5" inputmode="decimal" value="'+esc(o.h)+'"></div>'
+    +'<div class="field"><label class="lbl" for="'+p+'h">Hours for homework and studying that week</label><input type="number" id="'+p+'h" min="0" max="168" step="0.5" inputmode="decimal" value="'+esc(o.h)+'"></div>'
     +'</div><button type="button" class="btn2" data-rmo="'+i+'">Remove this week<span class="sr"> (different week '+(i+1)+')</span></button></fieldset>'});
   $('overs').innerHTML=h;$('addO').disabled=overs.length>=MAXO}
 $('addT').addEventListener('click',function(){readTasks();if(tasks.length<MAXT){tasks.push(blankT());renderTasks();$('taskMsg').textContent='Task '+tasks.length+' added.';$('t'+(tasks.length-1)+'_n').focus()}});
@@ -236,40 +263,78 @@ $('tasks').addEventListener('click',function(e){var b=e.target.closest('button[d
 $('addO').addEventListener('click',function(){readOvers();if(overs.length<MAXO){overs.push({d:'',h:''});renderOvers();$('overMsg').textContent='Different week '+overs.length+' added.';$('o'+(overs.length-1)+'_d').focus()}});
 $('overs').addEventListener('click',function(e){var b=e.target.closest('button[data-rmo]');if(!b)return;readOvers();var i=parseInt(b.getAttribute('data-rmo'),10);overs.splice(i,1);renderOvers();$('overMsg').textContent='Different week '+(i+1)+' removed.';$('addO').focus()});
 
-/* ---------- step 1 helper ---------- */
-function fixedTotal(){var t=0,any=false;['fw','ff','fo','fs'].forEach(function(id){var v=num(val(id));if(v!==null){t+=v;if(id!=='fs')any=true}});return {t:t,any:any}}
-function leftMsg(){var f=fixedTotal(),m=$('left'),l=168-f.t;
-  if(f.t>168){m.textContent='These add up to more than the 168 hours in a week. Check your numbers.';return}
-  m.textContent='Hours left in your week after these: '+(Math.round(l*2)/2)+' (168 hours in a week, minus '+(Math.round(f.t*2)/2)+').'}
-['fw','ff','fo','fs'].forEach(function(id){$(id).addEventListener('input',leftMsg)});
+/* ---------- step 1: hours already taken, hours left ---------- */
+function tally(){var rows=[],t=0;
+  FIX.forEach(function(f){var v=num(val(f[0]));if(v){rows.push([f[1],v]);t+=v}});
+  var sl=num(val('sl')),ml=num(val('ml'));
+  if(sl){rows.push(['Sleep ('+sl+' hours a night for 7 nights)',sl*7]);t+=sl*7}
+  if(ml){rows.push(['Meals and personal care ('+ml+' hours a day for 7 days)',ml*7]);t+=ml*7}
+  return {rows:rows,t:t}}
+function refresh(){
+  var T=tally(),l=168-T.t,h='';
+  T.rows.forEach(function(r){h+='<li>'+esc(r[0])+': '+half(r[1])+'</li>'});
+  $('brk').innerHTML=h||'<li>Nothing entered yet.</li>';
+  if(T.t>168){$('left').textContent='These add up to '+half(T.t)+' hours, which is more than the 168 hours in a week. Check your numbers.';$('wkLeft').textContent=''}
+  else{$('left').textContent='Total already taken: '+half(T.t)+' hours. Hours left in your week: '+half(l)+' (168 hours in a week minus '+half(T.t)+').';$('wkLeft').textContent=' Hours left in your week: '+half(l)+'.'}
+  var wk=num(val('wk')),a='';
+  if(wk!==null&&wk>0&&T.t<=168){var rest=l-wk;
+    a=rest<0?'That is more than the hours left in your week.':'That leaves about '+half(rest)+' hours for rest, time with family and friends, errands, and things that come up. Does that feel realistic?'}
+  $('after').textContent=a;
+  var u=num(val('un')),o='';
+  if(u!==null&&u>0){var est=u*UNIT_HOURS,cl=num(val('ct'))||0;
+    o='A rule of thumb: about '+UNIT_HOURS+' hours of work a week for each unit, counting time in class. For '+half(u)+(u===1?' unit':' units')+', that is about '+half(est)+' hours a week in all.';
+    if(wk!==null&&wk>0&&cl>0){var set=cl+wk,diff=est-set;
+      o+=' You have set aside '+half(set)+' hours ('+half(cl)+' in class and '+half(wk)+' for homework and studying outside of class).';
+      o+=diff>0.25?' That is about '+half(diff)+' hours less than the rule of thumb. Think about whether the hours you set aside are realistic.':' That is at or above the rule of thumb.';
+      o+=' Classes with labs or hands-on work can take longer.'}
+    else if(wk!==null&&wk>0)o+=' Enter your time in class above to compare it with the hours you set aside.';
+    else o+=' Enter your homework and studying hours above to compare.'}
+  $('unitsOut').textContent=o}
+['ct','fw','ff','ftr','fo','sl','ml','wk','un'].forEach(function(id){$(id).addEventListener('input',refresh)});
 
 /* ---------- navigation ---------- */
-function show(n){cur=n;[1,2,3].forEach(function(i){$('s'+i).hidden=i!==n});$('prog').textContent='Step '+n+' of 3';$('barfill').style.width=(n/3*100)+'%';$(['','h1a','h2a','h3a'][n]).focus();window.scrollTo(0,0)}
-function showErrs(id,errs){var box=$(id);box.innerHTML=errs.length?errs.map(function(e){return '<div>'+esc(e[0])+'</div>'}).join(''):'';if(errs.length&&errs[0][1]&&$(errs[0][1]))$(errs[0][1]).focus();return errs.length>0}
+function show(n){cur=n;[1,2,3].forEach(function(i){$('s'+i).hidden=i!==n});$('rs2').hidden=true;$('rs3').hidden=true;$('prog').textContent='Step '+n+' of 3';$('barfill').style.width=(n/3*100)+'%';$(['','h1a','h2a','h3a'][n]).focus();window.scrollTo(0,0)}
+function showErrs(id,errs){var box=$(id);box.innerHTML=errs.length?errs.map(function(e){return '<div>'+esc(e[0])+'</div>'}).join(''):'';if(errs.length&&errs[0][1]&&$(errs[0][1])){var el=$(errs[0][1]),dt=el.closest('details');if(dt)dt.open=true;el.focus()}return errs.length>0}
 $('to2').addEventListener('click',function(){
-  var e=[],s=parseDate(val('start')),wk=num(val('wk')),f=fixedTotal();
-  if(s===null)e.push(['Enter the first day of your plan as a full date.','start']);
-  if(wk===null||wk<=0)e.push(['Enter how many hours a week you can give to homework and studying.','wk']);
-  else if(f.any&&f.t<=168&&wk>168-f.t+1e-9)e.push(['You entered '+wk+' study hours, but only about '+(Math.round((168-f.t)*2)/2)+' hours are left in your week after the hours above. Lower the study hours or change the hours above.','wk']);
-  if(f.t>168)e.push(['The hours above add up to more than the 168 hours in a week. Check your numbers.','fw']);
+  var e=[],s=planStart(),wk=num(val('wk')),T=tally(),sl=num(val('sl')),ml=num(val('ml'));
+  if(s===null)e.push(['Enter the first day of your plan as a full date, or clear the box to plan from today.','start']);
+  FIX.forEach(function(f){var v=val(f[0]);if(v!==''&&(num(v)===null||num(v)>168))e.push([f[1]+': enter hours as a number from 0 to 168, or leave the box blank.',f[0]])});
+  if(sl===null||sl>24)e.push(['Enter how many hours you sleep each night, from 0 to 24.','sl']);
+  if(ml===null||ml>24)e.push(['Enter how many hours a day you spend on meals and personal care, from 0 to 24.','ml']);
+  if(sl!==null&&ml!==null&&sl+ml>24)e.push(['Sleep plus meals and personal care is more than 24 hours a day. Check your numbers.','sl']);
+  if(!e.length&&T.t>168)e.push(['The hours above add up to more than the 168 hours in a week. Check your numbers.','ct']);
+  if(wk===null||wk<=0)e.push(['Enter how many hours a week you will give to homework and studying outside of class.','wk']);
+  else if(!e.length&&wk>168-T.t+1e-9)e.push(['You entered '+wk+' hours for homework and studying, but only about '+half(168-T.t)+' hours are left in your week after the hours above. Lower the study hours or change the hours above.','wk']);
   if(showErrs('err1',e))return;
   if(!tasks.length){tasks=[blankT(),blankT(),blankT()];renderTasks()}
   if(!overs.length)renderOvers();
   show(2)});
 $('back1').addEventListener('click',function(){readTasks();readOvers();show(1)});
 $('back2').addEventListener('click',function(){show(2)});
+$('hrs3').addEventListener('click',function(){show(1)});
+
+/* ---------- start over ---------- */
+function resetAll(){
+  ['ct','fw','ff','ftr','fo','wk','un','start'].forEach(function(id){$(id).value=''});$('sl').value='8';$('ml').value='2';
+  tasks=[];overs=[];lastText='';$('tasks').innerHTML='';$('overs').innerHTML='';$('results').innerHTML='';
+  ['err1','err2','taskMsg','overMsg','copyMsg'].forEach(function(id){$(id).textContent=''});$('fbWrap').hidden=true;$('fb').value='';
+  document.querySelectorAll('#s1 details').forEach(function(d){d.open=false});
+  refresh();show(1)}
+[2,3].forEach(function(n){
+  $('so'+n).addEventListener('click',function(){$('rs'+n).hidden=false;$('rs'+n).focus()});
+  $('rsN'+n).addEventListener('click',function(){$('rs'+n).hidden=true;$('so'+n).focus()});
+  $('rsY'+n).addEventListener('click',resetAll)});
 
 /* ---------- validate and plan ---------- */
 function gather(){
   readTasks();readOvers();
-  var errs=[],start=parseDate(val('start')),wk=num(val('wk')),list=[],ov={};
-  var lim=start+MAXW*7;
+  var errs=[],start=planStart(),wk=num(val('wk')),list=[],ov={},mon=monIdx(start),lim=start+MAXW*7;
   tasks.forEach(function(t,i){
     if(!(t.c||t.n||t.d||t.s||t.h))return;
     var p='t'+i+'_',label='Task '+(i+1),due=parseDate(t.d),h=null;
     if(due===null){errs.push([label+': enter the due date as a full date.',p+'d']);return}
-    if(due<start){errs.push([label+' is due on '+dstr(due)+', before the first day of your plan ('+dstr(start)+'). Change the date, or go back and change the first day.',p+'d']);return}
-    if(due>=lim){errs.push([label+': the due date is more than '+MAXW+' weeks after the first day of your plan. Choose a nearer date, or plan that task later.',p+'d']);return}
+    if(due<start){errs.push([label+' is due on '+dstr(due)+', which is before the day your plan starts ('+dstr(start)+'). Check the date.',p+'d']);return}
+    if(due>=lim){errs.push([label+': the due date is more than '+MAXW+' weeks away. Choose a nearer date, or plan that task later.',p+'d']);return}
     if(t.h!==''){h=num(t.h);if(h===null||h<=0||h>200){errs.push([label+': type hours between 0.5 and 200, or clear the box and choose a size.',p+'h']);return}}
     else if(t.s!==''){h=parseFloat(t.s)}
     else{errs.push([label+': choose how big it is, or type the hours.',p+'s']);return}
@@ -279,26 +344,27 @@ function gather(){
     if(!(o.d||o.h))return;var p='o'+i+'_',d=parseDate(o.d),h=num(o.h),label='Different week '+(i+1);
     if(d===null){errs.push([label+': enter a full date.',p+'d']);return}
     if(d<start||d>=lim){errs.push([label+': choose a date between '+dstr(start)+' and the end of your '+MAXW+'-week plan.',p+'d']);return}
-    if(h===null||h>168){errs.push([label+': enter the study hours for that week, from 0 to 168.',p+'h']);return}
-    ov[Math.floor((d-start)/7)]=h});
+    if(h===null||h>168){errs.push([label+': enter the hours for that week, from 0 to 168.',p+'h']);return}
+    ov[Math.floor((d-start+mon)/7)]=h});
   return {errs:errs,start:start,wk:wk,list:list,ov:ov}}
 
 function compute(G){
-  var start=G.start,L=G.list.map(function(t){return {i:t.i,name:t.name,course:t.course,off:t.due-start,due:t.due,h:t.h}});
+  var start=G.start,mon=monIdx(start),L=G.list.map(function(t){return {i:t.i,name:t.name,course:t.course,off:t.due-start,due:t.due,h:t.h}});
   L.sort(function(a,b){return a.off-b.off||b.h-a.h||a.i-b.i});
-  var lastOff=L[L.length-1].off,nW=Math.floor(lastOff/7)+1,days=nW*7,cap=[],w,d,i;
-  for(w=0;w<nW;w++)cap[w]=G.ov[w]!==undefined?G.ov[w]:G.wk;
-  var cum=[],run=0;for(d=0;d<days;d++){run+=cap[Math.floor(d/7)]/7;cum[d]=run}
+  var lastOff=L[L.length-1].off,nW=Math.floor((lastOff+mon)/7)+1,days=nW*7-mon,cap=[],w,d,i;
+  var daysIn=function(k){return k===0?7-mon:7},weekOf=function(o){return Math.floor((o+mon)/7)};
+  for(w=0;w<nW;w++)cap[w]=G.ov[w]!==undefined?G.ov[w]:G.wk*daysIn(w)/7;
+  var cum=[],run=0;for(d=0;d<days;d++){run+=cap[weekOf(d)]/daysIn(weekOf(d));cum[d]=run}
   var ustar=0,need=0,gap=0,gapOff=0;
   L.forEach(function(t,k){need+=t.h;var nxt=L[k+1];if(nxt&&nxt.off===t.off)return;
     var c=cum[t.off];if(c<=1e-9){ustar=Infinity}else{ustar=Math.max(ustar,need/c)}
-    if(need-c>gap+1e-9){gap=need-c;gapOff=t.off;}});
+    if(need-c>gap+1e-9){gap=need-c;gapOff=t.off}});
   var feasible=ustar<=1+1e-9,pace=feasible?Math.min(1,Math.max(ustar,BUFFER)):1;
   var rem=L.map(function(t){return t.h}),al=L.map(function(){var a=[];for(var x=0;x<nW;x++)a.push(0);return a});
-  for(d=0;d<days;d++){var c=pace*cap[Math.floor(d/7)]/7,wi=Math.floor(d/7);
+  for(d=0;d<days;d++){var c=pace*cap[weekOf(d)]/daysIn(weekOf(d)),wi=weekOf(d);
     for(i=0;i<L.length&&c>1e-9;i++){if(rem[i]>1e-9&&L[i].off>=d){var tk=Math.min(rem[i],c);rem[i]-=tk;al[i][wi]+=tk;c-=tk}}}
-  var W=[];for(w=0;w<nW;w++)W.push({w:w,s:start+w*7,e:start+w*7+6,cap:cap[w],planned:0,dueN:0,dueH:0,short:0,items:[],reasons:[],level:0});
-  L.forEach(function(t,k){var dw=Math.floor(t.off/7);W[dw].dueN++;W[dw].dueH+=t.h;t.short=rem[k]>0.05?rem[k]:0;if(t.short>0)W[dw].short+=t.short;
+  var W=[];for(w=0;w<nW;w++){var s0=w===0?0:w*7-mon;W.push({w:w,s:start+s0,e:start+w*7-mon+6,cap:cap[w],planned:0,dueN:0,dueH:0,short:0,items:[],reasons:[],level:0,partial:w===0&&mon>0})}
+  L.forEach(function(t,k){var dw=weekOf(t.off);W[dw].dueN++;W[dw].dueH+=t.h;t.short=rem[k]>0.05?rem[k]:0;if(t.short>0)W[dw].short+=t.short;
     var first=-1,last=-1;for(w=0;w<nW;w++){W[w].planned+=al[k][w];if(al[k][w]>=0.25){W[w].items.push({name:t.name,course:t.course,h:al[k][w]});if(first<0)first=w;last=w}}
     t.first=first;t.last=last});
   var crowdedList=[];
@@ -308,18 +374,19 @@ function compute(G){
     if(x.dueN>=CROWD_COUNT){x.level=Math.max(x.level,1);x.reasons.push(x.dueN+' tasks are due this week.')}
     if(x.level>0)crowdedList.push(x)});
   var total=0;L.forEach(function(t){total+=t.h});
-  return {L:L,W:W,nW:nW,feasible:feasible,ustar:ustar,pace:pace,total:total,avail:cum[days-1],availToLast:cum[lastOff],gap:gap,gapOff:gapOff,crowded:crowdedList,start:start,wk:G.wk,hasOv:Object.keys(G.ov).length>0}}
+  return {L:L,W:W,nW:nW,mon:mon,feasible:feasible,ustar:ustar,pace:pace,total:total,availToLast:cum[lastOff],gap:gap,gapOff:gapOff,crowded:crowdedList,start:start,wk:G.wk,hasOv:Object.keys(G.ov).length>0}}
 
 $('to3').addEventListener('click',function(){
   var G=gather();if(showErrs('err2',G.errs))return;
   buildResults(compute(G));show(3)});
 
 /* ---------- results ---------- */
+function wname(x){return 'Week '+(x.w+1)+(x.partial?' (the rest of this week)':'')}
+function wrange(x){return x.s===x.e?dstr(x.s):dstr(x.s)+' to '+dstr(x.e)}
 function buildResults(M){
-  var H='',T=[],L=M.L,first=L[0],last=L[L.length-1];
-  var big=[];
+  var H='',T=[],L=M.L,first=L[0],last=L[L.length-1],big=[];
   big.push('You entered '+L.length+(L.length===1?' task':' tasks')+' with about '+hrs(M.total)+' of work, due between '+dstr(first.due)+' and '+dstr(last.due)+'.');
-  big.push('From '+dstr(M.start)+' through '+dstr(last.due)+', your study hours add up to about '+hrs(M.availToLast)+(M.hasOv?' (counting the weeks you changed).':'.'));
+  big.push('From '+dstr(M.start)+(M.start===todayDay()?' (today)':'')+' through '+dstr(last.due)+', your study hours add up to about '+hrs(M.availToLast)+(M.hasOv?' (counting the weeks you changed).':'.'));
   if(M.feasible){
     if(M.pace>BUFFER+1e-6)big.push('On paper, everything fits, but only just. The plan has to use about '+Math.round(M.pace*100)+' percent of your study hours in the busy weeks. That leaves little room for surprises.');
     else big.push('On paper, everything fits. The plan below uses no more than '+Math.round(BUFFER*100)+' percent of your study hours in a week, to leave room for surprises.');
@@ -330,11 +397,11 @@ function buildResults(M){
     else big.push('You have no study hours before a due date. Check the hours you entered.');
   }
   H+='<div class="card"><h3 style="margin-top:0">The big picture</h3>';big.forEach(function(s){H+='<p>'+esc(s)+'</p>'});H+='</div>';
-  T.push('DEADLINE PILE-UP PLAN','Plan starts '+dstrY(M.start)+'.','');big.forEach(function(s){T.push(s)});T.push('');
+  T.push('DEADLINE PILE-UP PLAN','Planning from '+dstrY(M.start)+'.','');big.forEach(function(s){T.push(s)});T.push('');
   H+='<div class="card"><h3 style="margin-top:0">Crowded weeks</h3>';
   if(!M.crowded.length){H+='<p>No crowded weeks showed up with the numbers you entered. Check again if your due dates or hours change.</p>';T.push('CROWDED WEEKS','None found with the numbers entered.','')}
   else{H+='<ul class="plain">';T.push('CROWDED WEEKS');
-    M.crowded.forEach(function(x){var lab='Week '+(x.w+1)+' ('+dstr(x.s)+' to '+dstr(x.e)+')',st=x.level===2?'Too full':'Crowded';
+    M.crowded.forEach(function(x){var lab=wname(x)+' ('+wrange(x)+')',st=x.level===2?'Too full':'Crowded';
       H+='<li><strong>'+esc(lab)+': '+st+'.</strong> '+esc(x.reasons.join(' '))+'</li>';T.push('- '+lab+': '+st+'. '+x.reasons.join(' '))});
     H+='</ul>';T.push('')}
   H+='</div>';
@@ -344,9 +411,10 @@ function buildResults(M){
     var line='Due '+dstr(t.due)+'. About '+hrs(t.h)+(wk?'. Plan to work on it in '+wk+'.':'.')+(t.short>0?(t.short>=t.h-0.05?' None of it fits before the due date.':' About '+hrsMin(t.short)+' of it does not fit before the due date.'):'');
     H+='<li><strong>'+esc(nm)+'</strong><br>'+esc(line)+'</li>';T.push((k+1)+'. '+nm+'. '+line)});
   H+='</ol></div>';T.push('');
-  H+='<h3>Week by week</h3><p class="small">Hours are rounded to the nearest half hour. Weeks are 7-day blocks starting on '+esc(dstr(M.start))+'. The plan counts the due date itself as a day you can work, and it treats your study hours as spread evenly across the week.</p><ol class="weeks">';
-  T.push('WEEK BY WEEK','Hours are rounded to the nearest half hour. Weeks are 7-day blocks starting on '+dstr(M.start)+'.','');
-  M.W.forEach(function(x){var lab='Week '+(x.w+1)+': '+dstr(x.s)+' to '+dstr(x.e),st=x.level===2?['over','Too full']:x.level===1?['crowd','Crowded']:['ok','Manageable'],p=pct(x.planned,x.cap);
+  var note='Hours are rounded to the nearest half hour. Weeks run Monday to Sunday'+(M.mon>0?', and week 1 is only the rest of this week':'')+'. The plan counts the due date itself as a day you can work, and it treats your study hours as spread evenly across the days of the week.';
+  H+='<h3>Week by week</h3><p class="small">'+esc(note)+'</p><ol class="weeks">';
+  T.push('WEEK BY WEEK',note,'');
+  M.W.forEach(function(x){var lab=wname(x)+': '+wrange(x),st=x.level===2?['over','Too full']:x.level===1?['crowd','Crowded']:['ok','Manageable'],p=pct(x.planned,x.cap);
     H+='<li class="card '+(x.level===2?'over-card':x.level===1?'crowd-card':'')+'"><h4>'+esc(lab)+' <span class="st '+st[0]+'">'+st[1]+'</span></h4>'
       +'<div class="meter" aria-hidden="true"><span style="width:'+Math.min(100,p)+'%"></span></div>'
       +'<p style="margin:0 0 .5rem">Planned: about '+hrs(x.planned)+' of '+hrs(x.cap)+' available'+(x.cap>0?' ('+p+' percent)':'')+'. Due this week: '+x.dueN+(x.dueN===1?' task':' tasks')+(x.dueN?' (about '+hrs(x.dueH)+' of work)':'')+'.</p>';
@@ -370,7 +438,7 @@ $('copyBtn').addEventListener('click',function(){
 $('printBtn').addEventListener('click',function(){window.print()});
 
 /* ---------- start ---------- */
-$('start').value=todayStr();leftMsg();$('app').hidden=false;show(1);window.scrollTo(0,0);
+refresh();$('app').hidden=false;show(1);window.scrollTo(0,0);
 
 })();
 </script>
