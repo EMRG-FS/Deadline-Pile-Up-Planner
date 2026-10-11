@@ -119,7 +119,7 @@ summary{font-weight:bold;color:var(--forest);cursor:pointer;min-height:44px;disp
 
 <section id="s1" aria-labelledby="h1a">
 <h2 id="h1a" tabindex="-1">Step 1. Your time</h2>
-<div id="vid" hidden class="note"><p style="margin:0 0 .75rem"><strong>New to this tool?</strong> A short how-to video shows how to use each step.</p><a class="btn" id="vidLink" href="#" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;line-height:1.9">Watch the how-to video<span class="sr"> (opens in a new tab)</span></a></div>
+<div id="vid" hidden class="note"><p style="margin:0 0 .75rem"><strong>New to this tool?</strong> A short how-to video shows how to use each step.</p><a class="btn" id="vidLink" href="#" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;font-weight:bold;padding:.6rem 1.25rem;min-height:48px;line-height:1.6;border-radius:8px">Watch the how-to video<span class="sr"> (opens in a new tab)</span></a></div>
 <div class="note"><p style="margin:0 0 .75rem">When several due dates land in the same week, it is easy to feel buried. This tool adds up the hours you enter and shows which weeks look crowded, so you can plan before they arrive.</p><p style="margin:0">It also helps you see how much time your week really has for your education. First you list the hours that are already taken. The tool shows the hours that are left, and you decide how many of them can go to homework and studying.</p></div>
 <div class="err warn" id="err1" role="alert"></div>
 <div class="card">
@@ -219,7 +219,7 @@ var SIZES=[['','Choose a size'],['1','Small (about 1 hour)'],['3','Medium (about
 var BUFFER=0.7,CROWD_COUNT=3,MAXW=26,MAXT=30,MAXO=6,UNIT_HOURS=3;
 var FIX=[['ct','Time in class'],['fw','Paid work'],['ff','Family and care'],['ftr','Travel to school and work'],['fo','Other fixed hours']];
 var tasks=[],overs=[],cur=1,lastText='';
-var VIDEO_URL='';
+var VIDEO_URL='https://www.freshstart-online.com/en/video-details/deadline-pile-up-planner-tool-explainer-video/28822/';
 if(VIDEO_URL){$('vidLink').href=VIDEO_URL;$('vid').hidden=false}
 
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
@@ -293,7 +293,7 @@ function refresh(){
 ['ct','fw','ff','ftr','fo','sl','ml','wk','un'].forEach(function(id){$(id).addEventListener('input',refresh)});
 
 /* ---------- navigation ---------- */
-function show(n){cur=n;[1,2,3].forEach(function(i){$('s'+i).hidden=i!==n});$('rs2').hidden=true;$('rs3').hidden=true;$('prog').textContent='Step '+n+' of 3';$('barfill').style.width=(n/3*100)+'%';$(['','h1a','h2a','h3a'][n]).focus();window.scrollTo(0,0)}
+function show(n,nf){cur=n;[1,2,3].forEach(function(i){$('s'+i).hidden=i!==n});$('rs2').hidden=true;$('rs3').hidden=true;$('prog').textContent='Step '+n+' of 3';$('barfill').style.width=(n/3*100)+'%';if(!nf)$(['','h1a','h2a','h3a'][n]).focus();window.scrollTo(0,0)}
 function showErrs(id,errs){var box=$(id);box.innerHTML=errs.length?errs.map(function(e){return '<div>'+esc(e[0])+'</div>'}).join(''):'';if(errs.length&&errs[0][1]&&$(errs[0][1])){var el=$(errs[0][1]),dt=el.closest('details');if(dt)dt.open=true;el.focus()}return errs.length>0}
 $('to2').addEventListener('click',function(){
   var e=[],s=planStart(),wk=num(val('wk')),T=tally(),sl=num(val('sl')),ml=num(val('ml'));
@@ -438,7 +438,7 @@ $('copyBtn').addEventListener('click',function(){
 $('printBtn').addEventListener('click',function(){window.print()});
 
 /* ---------- start ---------- */
-refresh();$('app').hidden=false;show(1);window.scrollTo(0,0);
+refresh();$('app').hidden=false;show(1,true);window.scrollTo(0,0);
 
 })();
 </script>
