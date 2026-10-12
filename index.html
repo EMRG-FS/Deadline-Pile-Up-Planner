@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Deadline Pile-Up Planner</title>
+<title>Time and Deadline Planner</title>
 <style>
 :root{--forest:#013220;--gold:#C6A15B;--warm:#7B7B7B;--ivory:#F8F5E9;--char:#333333;--sage:#A3B18A;--coral:#D97A6A;--sky:#89B6A5;--sage-tint:#E4EADA;--coral-tint:#F7E0DB;--sky-tint:#DCEBE5;--white:#FFFFFF}
 *{box-sizing:border-box}
@@ -107,8 +107,8 @@ summary{font-weight:bold;color:var(--forest);cursor:pointer;min-height:44px;disp
 <a class="skip" href="#main">Skip to main content</a>
 <header class="band"><div class="wrap">
 <p class="kicker">PLANNING TOOL</p>
-<h1>Deadline Pile-Up Planner</h1>
-<p>Add your due dates and your busy hours. See which weeks get crowded and what to work on first.</p>
+<h1>Time and Deadline Planner</h1>
+<p>See how much time your week has for school. Add your due dates to see which weeks get crowded and what to work on first.</p>
 </div></header>
 <main id="main">
 <noscript><div class="warn">This tool needs JavaScript turned on. Without it, you can still do the same thing on paper: list the hours already taken in your week (class, work, family, travel, sleep), subtract them from 168 to see the hours left, then list every due date and guess the hours each task needs. Mark any week where the hours you need are close to the hours you have.</div></noscript>
@@ -151,7 +151,7 @@ summary{font-weight:bold;color:var(--forest);cursor:pointer;min-height:44px;disp
 <p id="after" role="status" class="score"></p>
 <details>
 <summary>Optional: check your hours against your units</summary>
-<p class="small">If your classes are for credit, enter the number of units you are taking. If your classes are noncredit, skip this and ask your program how many hours a week it expects.</p>
+<p class="small">If your classes are for credit, enter the number of units you are taking. The rule of thumb below is for a full-length term. Short classes need more hours a week. If your classes are noncredit, skip this and ask your program how many hours a week it expects.</p>
 <div class="field" style="max-width:16rem"><label class="lbl" for="un">Units you are taking</label><input type="number" id="un" min="0" max="40" step="0.5" inputmode="decimal"></div>
 <p id="unitsOut" role="status" class="small"></p>
 </details>
@@ -161,7 +161,8 @@ summary{font-weight:bold;color:var(--forest);cursor:pointer;min-height:44px;disp
 <p class="small" id="startH">The plan starts today. If you are planning ahead, you can pick a different first day.</p>
 <div class="field" style="max-width:16rem"><label class="lbl" for="start">First day of your plan</label><input type="date" id="start" aria-describedby="startH"></div>
 </details>
-<div class="row"><button type="button" class="btn" id="to2">Next: Add your tasks</button></div>
+<div class="row"><button type="button" class="btn" id="to2">Next: Add your tasks</button><button type="button" class="btn2" id="tm1">Just show my weekly time</button></div>
+<p class="small" id="tmH">Not ready to add tasks? Choose Just show my weekly time to see a summary of your week first. You can add tasks later.</p>
 </section>
 
 <section id="s2" aria-labelledby="h2a" hidden>
@@ -203,6 +204,20 @@ summary{font-weight:bold;color:var(--forest);cursor:pointer;min-height:44px;disp
 <p class="small noprint" id="copyMsg" role="status"></p>
 <p class="small noprint">You can also print with Ctrl+P (Windows) or Cmd+P (Mac).</p>
 <div id="fbWrap" hidden><label class="lbl" for="fb">Copy this text yourself (select all, then copy)</label><textarea id="fb" class="fallback" readonly></textarea></div>
+</section>
+
+<section id="sT" aria-labelledby="hTa" hidden>
+<h2 id="hTa" tabindex="-1">Your weekly time</h2>
+<div id="timeRes"></div>
+<div class="row noprint">
+<button type="button" class="btn" id="copyT">Copy my weekly time</button>
+<button type="button" class="btn2" id="printT">Print my weekly time</button>
+<button type="button" class="btn2" id="backT">Change my hours</button>
+<button type="button" class="btn2" id="nextT">Next: Add your tasks</button>
+</div>
+<p class="small noprint" id="copyMsgT" role="status"></p>
+<p class="small noprint">You can also print with Ctrl+P (Windows) or Cmd+P (Mac).</p>
+<div id="fbWrapT" hidden><label class="lbl" for="fbT">Copy this text yourself (select all, then copy)</label><textarea id="fbT" class="fallback" readonly></textarea></div>
 </section>
 </div>
 </main>
@@ -270,6 +285,17 @@ function tally(){var rows=[],t=0;
   if(sl){rows.push(['Sleep ('+sl+' hours a night for 7 nights)',sl*7]);t+=sl*7}
   if(ml){rows.push(['Meals and personal care ('+ml+' hours a day for 7 days)',ml*7]);t+=ml*7}
   return {rows:rows,t:t}}
+function unitsText(){
+  var wk=num(val('wk')),u=num(val('un')),o='';
+  if(u!==null&&u>0){var est=u*UNIT_HOURS,cl=num(val('ct'))||0;
+    o='A rule of thumb for a full-length term (about 16 weeks): at least about '+UNIT_HOURS+' hours of work a week for each unit, counting time in class. For '+half(u)+(u===1?' unit':' units')+', that is at least about '+half(est)+' hours a week in all.';
+    if(wk!==null&&wk>0&&cl>0){var set=cl+wk,diff=est-set;
+      o+=' You have set aside '+half(set)+' hours ('+half(cl)+' in class and '+half(wk)+' for homework and studying outside of class).';
+      o+=diff>0.25?' That is about '+half(diff)+' hours less than this rule of thumb. Think about whether the hours you set aside are realistic.':' That is at or above this rule of thumb.'}
+    else if(wk!==null&&wk>0)o+=' Enter your time in class above to compare it with the hours you set aside.';
+    else o+=' Enter your homework and studying hours above to compare.';
+    o+=' Classes with labs or hands-on work can take longer. A class shorter than a full term, such as an 8-week class, fits the same work into fewer weeks. For example, an 8-week class takes about 6 hours a week for each unit.'}
+  return o}
 function refresh(){
   var T=tally(),l=168-T.t,h='';
   T.rows.forEach(function(r){h+='<li>'+esc(r[0])+': '+half(r[1])+'</li>'});
@@ -280,24 +306,15 @@ function refresh(){
   if(wk!==null&&wk>0&&T.t<=168){var rest=l-wk;
     a=rest<0?'That is more than the hours left in your week.':'That leaves about '+half(rest)+' hours for rest, time with family and friends, errands, and things that come up. Does that feel realistic?'}
   $('after').textContent=a;
-  var u=num(val('un')),o='';
-  if(u!==null&&u>0){var est=u*UNIT_HOURS,cl=num(val('ct'))||0;
-    o='A rule of thumb: about '+UNIT_HOURS+' hours of work a week for each unit, counting time in class. For '+half(u)+(u===1?' unit':' units')+', that is about '+half(est)+' hours a week in all.';
-    if(wk!==null&&wk>0&&cl>0){var set=cl+wk,diff=est-set;
-      o+=' You have set aside '+half(set)+' hours ('+half(cl)+' in class and '+half(wk)+' for homework and studying outside of class).';
-      o+=diff>0.25?' That is about '+half(diff)+' hours less than the rule of thumb. Think about whether the hours you set aside are realistic.':' That is at or above the rule of thumb.';
-      o+=' Classes with labs or hands-on work can take longer.'}
-    else if(wk!==null&&wk>0)o+=' Enter your time in class above to compare it with the hours you set aside.';
-    else o+=' Enter your homework and studying hours above to compare.'}
-  $('unitsOut').textContent=o}
+  $('unitsOut').textContent=unitsText()}
 ['ct','fw','ff','ftr','fo','sl','ml','wk','un'].forEach(function(id){$(id).addEventListener('input',refresh)});
 
 /* ---------- navigation ---------- */
-function show(n,nf){cur=n;[1,2,3].forEach(function(i){$('s'+i).hidden=i!==n});$('rs2').hidden=true;$('rs3').hidden=true;$('prog').textContent='Step '+n+' of 3';$('barfill').style.width=(n/3*100)+'%';if(!nf)$(['','h1a','h2a','h3a'][n]).focus();window.scrollTo(0,0)}
+function show(n,nf){cur=n;[1,2,3].forEach(function(i){$('s'+i).hidden=i!==n});$('sT').hidden=true;$('rs2').hidden=true;$('rs3').hidden=true;$('prog').textContent='Step '+n+' of 3';$('barfill').style.width=(n/3*100)+'%';if(!nf)$(['','h1a','h2a','h3a'][n]).focus();window.scrollTo(0,0)}
 function showErrs(id,errs){var box=$(id);box.innerHTML=errs.length?errs.map(function(e){return '<div>'+esc(e[0])+'</div>'}).join(''):'';if(errs.length&&errs[0][1]&&$(errs[0][1])){var el=$(errs[0][1]),dt=el.closest('details');if(dt)dt.open=true;el.focus()}return errs.length>0}
-$('to2').addEventListener('click',function(){
+function step1Errs(needStart){
   var e=[],s=planStart(),wk=num(val('wk')),T=tally(),sl=num(val('sl')),ml=num(val('ml'));
-  if(s===null)e.push(['Enter the first day of your plan as a full date, or clear the box to plan from today.','start']);
+  if(needStart&&s===null)e.push(['Enter the first day of your plan as a full date, or clear the box to plan from today.','start']);
   FIX.forEach(function(f){var v=val(f[0]);if(v!==''&&(num(v)===null||num(v)>168))e.push([f[1]+': enter hours as a number from 0 to 168, or leave the box blank.',f[0]])});
   if(sl===null||sl>24)e.push(['Enter how many hours you sleep each night, from 0 to 24.','sl']);
   if(ml===null||ml>24)e.push(['Enter how many hours a day you spend on meals and personal care, from 0 to 24.','ml']);
@@ -305,10 +322,45 @@ $('to2').addEventListener('click',function(){
   if(!e.length&&T.t>168)e.push(['The hours above add up to more than the 168 hours in a week. Check your numbers.','ct']);
   if(wk===null||wk<=0)e.push(['Enter how many hours a week you will give to homework and studying outside of class.','wk']);
   else if(!e.length&&wk>168-T.t+1e-9)e.push(['You entered '+wk+' hours for homework and studying, but only about '+half(168-T.t)+' hours are left in your week after the hours above. Lower the study hours or change the hours above.','wk']);
-  if(showErrs('err1',e))return;
+  return e}
+function goStep2(){
   if(!tasks.length){tasks=[blankT(),blankT(),blankT()];renderTasks()}
   if(!overs.length)renderOvers();
-  show(2)});
+  show(2)}
+$('to2').addEventListener('click',function(){if(showErrs('err1',step1Errs(true)))return;goStep2()});
+/* weekly time summary (no tasks needed) */
+var lastTimeText='';
+function buildTime(){
+  var T=tally(),l=168-T.t,wk=num(val('wk')),cl=num(val('ct'))||0,H='',X=[];
+  H+='<div class="card"><h3 style="margin-top:0">Your typical week</h3><p class="small">The hours that are already taken.</p><ul class="plain">';
+  X.push('MY WEEKLY TIME','','Hours already taken in a typical week:');
+  T.rows.forEach(function(r){H+='<li>'+esc(r[0])+': '+half(r[1])+'</li>';X.push('- '+r[0]+': '+half(r[1]))});
+  H+='</ul><p><strong>Total already taken: '+half(T.t)+' hours.</strong><br><strong>Hours left in your week: '+half(l)+'</strong> (168 hours in a week minus '+half(T.t)+').</p></div>';
+  X.push('Total already taken: '+half(T.t)+' hours.','Hours left in your week: '+half(l)+' (168 hours in a week minus '+half(T.t)+').','');
+  var rest=l-wk,sch=[];
+  sch.push('You chose '+half(wk)+' hours a week for homework and studying outside of class.');
+  if(cl>0)sch.push('With '+half(cl)+' hours in class, that is about '+half(cl+wk)+' hours a week for school in all.');
+  sch.push('That leaves about '+half(rest)+' hours for rest, time with family and friends, errands, and things that come up. Does that feel realistic?');
+  var ut=unitsText();if(ut)sch.push(ut);
+  H+='<div class="card"><h3 style="margin-top:0">Your time for school</h3>';X.push('Time for school:');
+  sch.forEach(function(p){H+='<p>'+esc(p)+'</p>';X.push(p)});H+='</div>';X.push('');
+  var q=['Is this more or less time than you expected?','Do the hours you set aside feel realistic? If not, what could change: work hours, family tasks, travel, or something else?','Which two or three blocks of time in your week could you protect for homework and studying?','If the hours do not add up, who could help? A counselor can talk with you about your class load. Your college may also have offices that help with things like childcare and transportation.'];
+  H+='<div class="card"><h3 style="margin-top:0">Questions to ask yourself</h3><ul class="plain">'+q.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div>';
+  X.push('Questions to ask myself:');q.forEach(function(x){X.push('- '+x)});X.push('');
+  var nx='When you have due dates, choose Next: Add your tasks to see which weeks look crowded.';
+  H+='<p>'+esc(nx)+'</p>';X.push(nx,'','This only adds up the hours entered. Every number comes from you.','Developed by Educational Management Resources Group (EMRG).');
+  $('timeRes').innerHTML=H;lastTimeText=X.join('\n');$('copyMsgT').textContent='';$('fbWrapT').hidden=true}
+function showT(){
+  cur='T';[1,2,3].forEach(function(i){$('s'+i).hidden=true});$('sT').hidden=false;$('rs2').hidden=true;$('rs3').hidden=true;
+  $('prog').textContent='Your weekly time summary';$('barfill').style.width='33%';$('hTa').focus();window.scrollTo(0,0)}
+$('tm1').addEventListener('click',function(){if(showErrs('err1',step1Errs(false)))return;buildTime();showT()});
+$('backT').addEventListener('click',function(){show(1)});
+$('nextT').addEventListener('click',function(){if(showErrs('err1',step1Errs(true))){show(1);return}goStep2()});
+$('printT').addEventListener('click',function(){window.print()});
+$('copyT').addEventListener('click',function(){
+  var ok=function(){$('copyMsgT').textContent='Your weekly time was copied.'};
+  var fb=function(){$('fbWrapT').hidden=false;$('fbT').value=lastTimeText;$('fbT').focus();$('fbT').select();$('copyMsgT').textContent='Copy was blocked. The text is below. Select it and copy it.'};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(lastTimeText).then(ok,fb)}else fb()});
 $('back1').addEventListener('click',function(){readTasks();readOvers();show(1)});
 $('back2').addEventListener('click',function(){show(2)});
 $('hrs3').addEventListener('click',function(){show(1)});
@@ -317,7 +369,7 @@ $('hrs3').addEventListener('click',function(){show(1)});
 function resetAll(){
   ['ct','fw','ff','ftr','fo','wk','un','start'].forEach(function(id){$(id).value=''});$('sl').value='8';$('ml').value='2';
   tasks=[];overs=[];lastText='';$('tasks').innerHTML='';$('overs').innerHTML='';$('results').innerHTML='';
-  ['err1','err2','taskMsg','overMsg','copyMsg'].forEach(function(id){$(id).textContent=''});$('fbWrap').hidden=true;$('fb').value='';
+  $('timeRes').innerHTML='';lastTimeText='';$('fbWrapT').hidden=true;$('fbT').value='';['err1','err2','taskMsg','overMsg','copyMsg','copyMsgT'].forEach(function(id){$(id).textContent=''});$('fbWrap').hidden=true;$('fb').value='';
   document.querySelectorAll('#s1 details').forEach(function(d){d.open=false});
   refresh();show(1)}
 [2,3].forEach(function(n){
@@ -397,7 +449,7 @@ function buildResults(M){
     else big.push('You have no study hours before a due date. Check the hours you entered.');
   }
   H+='<div class="card"><h3 style="margin-top:0">The big picture</h3>';big.forEach(function(s){H+='<p>'+esc(s)+'</p>'});H+='</div>';
-  T.push('DEADLINE PILE-UP PLAN','Planning from '+dstrY(M.start)+'.','');big.forEach(function(s){T.push(s)});T.push('');
+  T.push('TIME AND DEADLINE PLAN','Planning from '+dstrY(M.start)+'.','');big.forEach(function(s){T.push(s)});T.push('');
   H+='<div class="card"><h3 style="margin-top:0">Crowded weeks</h3>';
   if(!M.crowded.length){H+='<p>No crowded weeks showed up with the numbers you entered. Check again if your due dates or hours change.</p>';T.push('CROWDED WEEKS','None found with the numbers entered.','')}
   else{H+='<ul class="plain">';T.push('CROWDED WEEKS');
